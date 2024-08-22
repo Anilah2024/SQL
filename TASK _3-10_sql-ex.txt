@@ -1,0 +1,91 @@
+TASK 3-10 
+https://sql-ex.ru/learn_exercises.php
+---------------------------------------------
+Задание 3.
+Найдите номер модели, объем памяти и размеры экранов ПК-блокнотов, цена которых превышает 1000 дол.
+
+Решение:
+SELECT model, ram, screen FROM laptop 
+WHERE price > 1000
+________________________
+
+Задание 4.
+Найдите все записи таблицы Printer для цветных принтеров.
+
+Решение:
+
+SELECT * FROM printer
+WHERE color = 'y'
+_________________________
+
+Задание 5.
+Найдите номер модели, скорость и размер жесткого диска ПК, имеющих 12x или 24x CD и цену менее 600 дол.
+
+Решение:
+
+SELECT model, speed, hd FROM PC
+WHERE cd IN ('12x', '24x') 
+AND price < 600
+_________________________
+
+Задание 6.
+Для каждого производителя, выпускающего ПК-блокноты c объемом жесткого диска не менее 10 Гбайт, найти скорости таких ПК-блокнотов. Вывод: производитель, скорость.
+
+Решение:
+
+SELECT DISTINCT t.maker, s.speed FROM LAPTOP s, PRODUCT t
+WHERE t.model = s.model
+AND s.hd >= 10
+_________________________
+
+Задание 7.
+Найдите номера моделей и цены всех имеющихся в продаже продуктов (любого типа) производителя B (латинская буква).
+
+Решение:
+
+SELECT laptop.model, laptop.price FROM laptop, product
+WHERE laptop.model=product.model
+AND product.maker = 'B'
+UNION 
+SELECT pc.model, pc.price FROM pc, product
+WHERE pc.model=product.model
+AND product.maker = 'B'
+UNION
+SELECT printer.model, printer.price FROM printer, product
+WHERE printer.model=product.model
+AND product.maker = 'B'
+_________________________
+
+Задание 8.
+Найдите производителя, выпускающего ПК, но не ПК-блокноты.
+
+Решение:
+
+SELECT DISTINCT maker FROM product
+WHERE type = 'PC'
+AND maker NOT IN 
+(SELECT maker FROM product
+WHERE type ='Laptop')
+_________________________
+
+Задание 9.
+Найдите производителей ПК с процессором не менее 450 Мгц. Вывести: Maker
+
+Решение:
+
+SELECT DISTINCT maker
+FROM product t, PC s
+WHERE t.model=s.model
+AND s.speed >= 450
+_________________________
+
+Задание 10.
+Найдите модели принтеров, имеющих самую высокую цену. Вывести: model, price
+
+Решение:
+
+SELECT model, price FROM Printer
+WHERE price= 
+(SELECT MAX(price) FROM Printer)
+________________________
+
