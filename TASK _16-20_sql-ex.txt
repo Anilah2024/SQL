@@ -1,0 +1,61 @@
+TASK 16-20 
+https://sql-ex.ru/learn_exercises.php
+---------------------------------------------
+Задание 16.
+Найдите пары моделей PC, имеющих одинаковые скорость и RAM. В результате каждая пара указывается только один раз, т.е. (i,j), но не (j,i), Порядок вывода: модель с большим номером, модель с меньшим номером, скорость и RAM.
+
+Решение:
+
+SELECT DISTINCT t.model, s.model, t.speed, t.ram FROM pc t, pc s 
+WHERE t.ram = s.ram 
+AND t.speed = s.speed 
+AND t.model > s.model
+________________________
+
+Задание 17.
+Найдите модели ПК-блокнотов, скорость которых меньше скорости каждого из ПК.
+Вывести: type, model, speed
+
+Решение:
+
+SELECT DISTINCT s.type, t.model, t.speed
+FROM Laptop t, Product s
+WHERE speed < ALL (SELECT speed FROM PC)
+AND s.model=t.model
+_________________________
+
+Задание 18.
+Найдите производителей самых дешевых цветных принтеров. Вывести: maker, price
+
+Решение:
+
+SELECT DISTINCT t.maker, s.price
+FROM Product t, Printer s
+WHERE t.model = s.model
+AND s.color = 'Y'
+AND s.price = (SELECT MIN(p.price)
+FROM Printer p
+WHERE p.color = 'Y')
+
+_________________________
+
+Задание 19.
+Для каждого производителя, имеющего модели в таблице Laptop, найдите средний размер экрана выпускаемых им ПК-блокнотов.
+Вывести: maker, средний размер экрана.
+
+Решение:
+
+SELECT DISTINCT maker, AVG(Screen) as AVG_screen FROM Laptop 
+JOIN Product ON Laptop.model = Product.model 
+GROUP BY maker
+_________________________
+
+Задание 20.
+Найдите производителей, выпускающих по меньшей мере три различных модели ПК. Вывести: Maker, число моделей ПК.
+
+Решение:
+
+SELECT maker, COUNT(*) FROM Product 
+WHERE type = 'PC' 
+GROUP BY Product.maker HAVING COUNT(*) >= 3
+_________________________
