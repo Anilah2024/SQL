@@ -1,0 +1,138 @@
+TASK 16-25 
+https://sql-ex.ru/learn_exercises.php
+---------------------------------------------
+Задание 16.
+Найдите пары моделей PC, имеющих одинаковые скорость и RAM. В результате каждая пара указывается только один раз, т.е. (i,j), но не (j,i), Порядок вывода: модель с большим номером, модель с меньшим номером, скорость и RAM.
+
+Решение:
+
+SELECT DISTINCT t.model, s.model, t.speed, t.ram FROM pc t, pc s 
+WHERE t.ram = s.ram 
+AND t.speed = s.speed 
+AND t.model > s.model
+________________________
+
+Задание 17.
+Найдите модели ПК-блокнотов, скорость которых меньше скорости каждого из ПК.
+Вывести: type, model, speed
+
+Решение:
+
+SELECT DISTINCT s.type, t.model, t.speed
+FROM Laptop t, Product s
+WHERE speed < ALL (SELECT speed FROM PC)
+AND s.model=t.model
+_________________________
+
+Задание 18.
+Найдите производителей самых дешевых цветных принтеров. Вывести: maker, price
+
+Решение:
+
+SELECT DISTINCT t.maker, s.price
+FROM Product t, Printer s
+WHERE t.model = s.model
+AND s.color = 'Y'
+AND s.price = (SELECT MIN(p.price)
+FROM Printer p
+WHERE p.color = 'Y')
+
+_________________________
+
+Задание 19.
+Для каждого производителя, имеющего модели в таблице Laptop, найдите средний размер экрана выпускаемых им ПК-блокнотов.
+Вывести: maker, средний размер экрана.
+
+Решение:
+
+SELECT DISTINCT maker, AVG(Screen) as AVG_screen FROM Laptop 
+JOIN Product ON Laptop.model = Product.model 
+GROUP BY maker
+_________________________
+
+Задание 20.
+Найдите производителей, выпускающих по меньшей мере три различных модели ПК. Вывести: Maker, число моделей ПК.
+
+Решение:
+
+SELECT maker, COUNT(*) FROM Product 
+WHERE type = 'PC' 
+GROUP BY Product.maker HAVING COUNT(*) >= 3
+_________________________
+
+Задание 21.
+Найдите максимальную цену ПК, выпускаемых каждым производителем, у которого есть модели в таблице PC.
+Вывести: maker, максимальная цена.
+
+Решение:
+
+SELECT t.maker, max(pc.price)
+FROM product t, pc
+WHERE t.model = pc.model
+AND t.type = 'PC'
+GROUP BY t.maker
+_________________________
+
+Задание 22.
+Для каждого значения скорости ПК, превышающего 600 МГц, определите среднюю цену ПК с такой же скоростью. Вывести: speed, средняя цена.
+
+Решение:
+
+SELECT speed, avg(price) from PC
+GROUP BY PC.speed
+HAVING (speed>600)
+_________________________
+
+Задание 23.
+Найдите производителей, которые производили бы как ПК
+со скоростью не менее 750 МГц, так и ПК-блокноты со скоростью не менее 750 МГц.
+Вывести: Maker
+
+Решение:
+
+SELECT DISTINCT t.maker
+FROM product t, pc
+WHERE t.model = pc.model
+AND t.type = 'pc'
+AND pc.speed >= 750
+AND EXISTS 
+           (SELECT 'x' fROM laptop l, product p
+            WHERE p.model = l.model
+            AND p.type = 'laptop'
+            AND p.maker = t.maker
+            AND l.speed >= 750)
+_________________________
+
+Задание 24.
+Перечислите номера моделей любых типов, имеющих самую высокую цену по всей имеющейся в базе данных продукции.
+
+Решение:
+
+SELECT model FROM (SELECT DISTINCT model, price FROM Laptop WHERE Laptop.price = (SELECT MAX(price) FROM Laptop)
+UNION
+SELECT DISTINCT model, price FROM PC WHERE PC.price = (SELECT MAX(price) FROM PC)
+UNION
+SELECT DISTINCT model, price FROM Printer WHERE Printer.price = (SELECT MAX(price) FROM Printer)) AS t
+WHERE t.price=(SELECT MAX(price) FROM (SELECT DISTINCT price FROM Laptop WHERE Laptop.price = (SELECT MAX(price) FROM Laptop)
+UNION
+SELECT DISTINCT price FROM PC WHERE PC.price = (SELECT MAX(price) FROM PC)
+UNION
+SELECT DISTINCT price FROM Printer WHERE Printer.price = (SELECT MAX(price) FROM printer)) AS t1 )
+_________________________
+
+Задание 25.
+Найдите производителей принтеров, которые производят ПК с наименьшим объемом RAM и с самым быстрым процессором среди всех ПК, имеющих наименьший объем RAM. Вывести: Maker
+
+Решение:
+
+SELECT distinct t.maker FROM product t
+WHERE t.type='Printer'
+INTERSECT
+SELECT DISTINCT t.maker FROM Product t 
+INNER JOIN PC ON t.model = PC.model WHERE t.type = 'PC' AND PC.ram IN 
+(SELECT MIN(PC.ram) FROM PC) 
+AND PC.speed IN 
+(SELECT MAX(PC.speed) FROM PC WHERE PC.ram 
+IN (SELECT MIN(PC.ram) FROM PC))
+_________________________
+
